@@ -10,22 +10,51 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 
-// chat.html'i ana sayfa yap
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "chat.html"));
 });
 
-// API endpoint
-app.post("/ask", (req, res) => {
-  const { question } = req.body;
+async function askOpenAI(question) {
+  const apiKey = process.env.OPENAI_API_KEY;
 
-  if (!question || question.trim() === "") {
+  if (!apiKey) {
+    return "OpenAI API anahtarı bulunamadı.";
+  }
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Sen Türkçe cevap veren yaratıcı bir asistansın." },
+        { role: "user", content: question }
+      ],
+      temperature: 0.7
+    })
+  });
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "Yanıt alınamadı.";
+}
+
+app.post("/ask", async (req, res) => {
+  const { question } = req.body || {};
+
+  if (!question || String(question).trim() === "") {
     return res.json({ answer: "Lütfen bir soru yaz." });
   }
 
-  res.json({
-    answer: `Soru başarıyla alındı:\n\n"${question}"`
-  });
+  try {
+    const answer = await askOpenAI(question);
+    res.json({ answer });
+  } catch (err) {
+    console.error(err);
+    res.json({ answer: "OpenAI bağlantısında hata oluştu." });
+  }
 });
 
 app.listen(PORT, () => {
