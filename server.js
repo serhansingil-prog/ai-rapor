@@ -10,9 +10,9 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 
-// Ana sayfa
+// chat.html'i ana sayfa yap
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "chat.html"));
 });
 
 // API endpoint
