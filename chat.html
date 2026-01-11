@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>AI Rapor Asistanı</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,34 +11,30 @@
     }
     textarea {
       width: 100%;
-      max-width: 600px;
       height: 100px;
-      padding: 10px;
-      font-size: 14px;
+      margin-bottom: 10px;
+      font-size: 16px;
     }
     button {
       padding: 10px 20px;
-      margin-top: 10px;
-      background: #4f46e5;
-      color: #fff;
-      border: none;
+      font-size: 16px;
       cursor: pointer;
     }
     pre {
       background: #fff;
       padding: 15px;
-      margin-top: 20px;
-      max-width: 600px;
+      margin-top: 15px;
       white-space: pre-wrap;
+      font-size: 15px;
     }
   </style>
 </head>
-
 <body>
 
   <h2>AI Rapor Asistanı</h2>
 
-  <textarea id="question" placeholder="Sorunu buraya yaz..."></textarea><br>
+  <textarea id="question" placeholder="Sorunu buraya yaz..."></textarea>
+  <br />
   <button onclick="ask()">Sor</button>
 
   <pre id="answer">Cevap burada görünecek...</pre>
@@ -47,15 +42,28 @@
   <script>
     async function ask() {
       const question = document.getElementById("question").value;
+      const answerBox = document.getElementById("answer");
 
-      const res = await fetch("/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question })
-      });
+      if (!question.trim()) {
+        answerBox.textContent = "Lütfen bir soru yaz.";
+        return;
+      }
 
-      const result = await res.json();
-      document.getElementById("answer").innerText = result.answer;
+      answerBox.textContent = "Yanıt alınıyor...";
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await res.json();
+        answerBox.textContent = data.answer || "Boş yanıt geldi.";
+      } catch (err) {
+        console.error(err);
+        answerBox.textContent = "Bir hata oluştu.";
+      }
     }
   </script>
 
