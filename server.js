@@ -1,56 +1,34 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
-import fetch from "node-fetch";
 import { fileURLToPath } from "url";
+
+const app = express();
+const PORT = process.env.PORT || 10000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+app.use(cors());
 app.use(express.json());
 
+// index.html'i root'tan servis et
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "chat.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.post("/ask", async (req, res) => {
   const { question } = req.body;
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "Sen profesyonel bir iş analisti ve rapor yazarı gibi Türkçe cevap ver."
-          },
-          {
-            role: "user",
-            content: question
-          }
-        ],
-        temperature: 0.3
-      })
-    });
-
-    const data = await response.json();
-    const answer = data.choices?.[0]?.message?.content || "Cevap alınamadı.";
-
-    res.json({ answer });
-
-  } catch (error) {
-    console.error(error);
-    res.json({ answer: "Bir hata oluştu." });
+  if (!question) {
+    return res.json({ answer: "Soru boş gönderildi." });
   }
+
+  res.json({
+    answer: `Soru başarıyla alındı:\n\n"${question}"`
+  });
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+  console.log(`Server running on port ${PORT}`);
 });
