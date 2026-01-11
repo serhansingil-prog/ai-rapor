@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>AI Rapor Asistanı</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -33,6 +34,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <h2>AI Rapor Asistanı</h2>
@@ -44,18 +46,17 @@
 
   <script>
     async function ask() {
-  const question = document.getElementById("question").value;
+      const question = document.getElementById("question").value;
 
-  const res = await fetch("http://localhost:3000/ask", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question })
-  });
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
 
-  const result = await res.json();
-  document.getElementById("answer").innerText = result.answer;
-}
-
+      const result = await res.json();
+      document.getElementById("answer").innerText = result.answer;
+    }
   </script>
 
 </body>
