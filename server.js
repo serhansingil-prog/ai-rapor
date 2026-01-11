@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,19 +8,19 @@ const PORT = process.env.PORT || 10000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
 app.use(express.json());
 
-// index.html'i root'tan servis et
+// Ana sayfa
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.post("/ask", async (req, res) => {
+// API endpoint
+app.post("/ask", (req, res) => {
   const { question } = req.body;
 
-  if (!question) {
-    return res.json({ answer: "Soru boş gönderildi." });
+  if (!question || question.trim() === "") {
+    return res.json({ answer: "Lütfen bir soru yaz." });
   }
 
   res.json({
