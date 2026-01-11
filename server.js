@@ -1,9 +1,10 @@
 const express = require("express");
 const path = require("path");
-const fetch = require("node-fetch");
+
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
-
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -37,7 +38,6 @@ app.post("/ask", async (req, res) => {
     });
 
     const data = await response.json();
-
     const answer = data.choices?.[0]?.message?.content || "Cevap alınamadı.";
 
     res.json({ answer });
@@ -49,7 +49,6 @@ app.post("/ask", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
